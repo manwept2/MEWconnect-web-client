@@ -1,0 +1,10 @@
+module.exports = {
+  extends: ['airbnb-base', 'prettier'],
+  rules: {
+    'prefer-destructuring': 'off',
+    'consistent-return': 'off',
+    'no-underscore-dangle': 'off',
+    'no-multi-assign': 'off',
+    'class-methods-use-this': 'off'
+  }
+}

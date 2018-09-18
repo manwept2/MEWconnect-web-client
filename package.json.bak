@@ -1,0 +1,26 @@
+{
+  "name": "@myetherwallet/mewconnect-web-client",
+  "homepage": "https://github.com/myetherwallet/MEWconnect-web-client",
+  "version": "1.0.2",
+  "main": "./dist/index.js",
+  "scripts": {
+    "start": "node ./example/peer_server/www.js",
+    "buildMew": "npm --prefix 'example/etherwallet' run build",
+    "build": "rimraf dist/ && babel ./src --out-dir dist/ && npm run buildProd",
+    "buildProd": "webpack --config webpack.config.js",
+    "buildProdBrowser": "webpack --config webpack.browser.config.js",
+    "buildDevBrowser": "webpack --config webpack.browser.config.js --progress",
+    "buildBrowserPack": "webpack --config webpack.pack.config.js --progress",
+    "watch": "webpack --config webpack.config.js --progress -w",
+    "watchBrowser": "webpack --config webpack.browser.config.js --progress -w",
+    "watchBrowserPack": "webpack --config webpack.pack.config.js --progress -w",
+    "nanobox": "nanobox deploy"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@babel/cli": "^7.0.0",
+    "@babel/core": "^7.0.0",
+    "@babel/node": "^7.0.0",
+    "@babel/preset-env": "^7.0.0"
+  }
+}

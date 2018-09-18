@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
 import createLogger from 'logging'
-const events = require('events')
-const EventEmitter = events.EventEmitter
-const {
+import { isBrowser } from 'browser-or-node'
+import events from 'events'
+import {
   versions,
   connectionCodeSchemas,
   connectionCodeSeparator,
@@ -11,11 +11,10 @@ const {
   stages,
   lifeCycle,
   communicationTypes
-} = require('./constants')
-const {
-  version,
-  stunServers
-} = require('./config')
+} from './constants'
+import { version, stunServers } from './config'
+
+const EventEmitter = events.EventEmitter
 
 const logger = createLogger('MewConnect-Logger')
 
@@ -24,24 +23,18 @@ class MewConnectCommon extends EventEmitter {
    * @param uiCommunicatorFunc
    * @param loggingFunc
    */
-  constructor (uiCommunicatorFunc, loggingFunc) {
+  constructor(uiCommunicatorFunc, loggingFunc) {
     super()
     // if null it calls the middleware registered to each specific lifecycle event
     this.uiCommunicatorFunc = uiCommunicatorFunc || this.applyLifeCycleListeners
-    // Need to think of a little better way to do the above (to have built in and custom)
-    // eslint-disable-next-line func-names
-    this.logger = typeof loggingFunc === 'undefined' ? function () {} : typeof loggingFunc === 'boolean' ? logger.debug : loggingFunc
+    this.logger = loggingFunc || logger.debug
 
-    this.isBrowser = typeof window !== 'undefined' &&
-    // eslint-disable-next-line no-undef
-      ({}).toString.call(window) === '[object Window]'
+    this.isBrowser = isBrowser
     this.middleware = []
     this.lifeCycleListeners = []
 
     this.jsonDetails = {
-      stunSrvers: [
-        ...stunServers
-      ],
+      stunSrvers: [...stunServers],
       signals: {
         ...signal
       },
@@ -68,7 +61,7 @@ class MewConnectCommon extends EventEmitter {
    *
    * @param uiCommunicationFunc
    */
-  setCommunicationFunction (uiCommunicationFunc) {
+  setCommunicationFunction(uiCommunicationFunc) {
     this.uiCommunicatorFunc = uiCommunicationFunc
   }
 
@@ -76,18 +69,16 @@ class MewConnectCommon extends EventEmitter {
    *
    * @param func
    */
-  use (func) {
+  use(func) {
     this.middleware.push(func)
   }
 
-  // eslint-disable-next-line consistent-return
-  useDataHandlers (input, fn) {
+  useDataHandlers(input, fn) {
     const fns = this.middleware.slice(0)
     if (!fns.length) return fn(null)
 
-    function run (i) {
-      // eslint-disable-next-line consistent-return
-      fns[i](input, (err) => {
+    function run(i) {
+      fns[i](input, err => {
         // upon error, short-circuit
         if (err) return fn(err)
 
@@ -98,16 +89,14 @@ class MewConnectCommon extends EventEmitter {
         run(i + 1)
       })
     }
-
     run(0)
   }
 
-  applyDatahandlers (data) {
-    const _this = this
+  applyDatahandlers(data) {
     // function that runs after all middleware
-    function next (args) {
+    const next = args => {
       if (args === null) {
-        if (_this.jsonDetails.communicationTypes[data.type]) {
+        if (this.jsonDetails.communicationTypes[data.type]) {
           throw new Error(`No Handler Exists for ${data.type}`)
         }
       }
@@ -121,7 +110,7 @@ class MewConnectCommon extends EventEmitter {
    * @param _signal
    * @param func
    */
-  registerLifeCycleListener (_signal, func) {
+  registerLifeCycleListener(_signal, func) {
     if (this.lifeCycleListeners[_signal]) {
       this.lifeCycleListeners[_signal].push(func)
     } else {
@@ -130,34 +119,28 @@ class MewConnectCommon extends EventEmitter {
     }
   }
 
-  // eslint-disable-next-line consistent-return
-  useLifeCycleListeners (_signal, input, fn) {
+  useLifeCycleListeners(_signal, input, fn) {
     let fns
-    if (this.lifeCycleListeners[_signal]) {
-      fns = this.lifeCycleListeners[_signal].slice(0)
-      if (!fns.length) return fn(null)
-
-      // eslint-disable-next-line no-use-before-define
-      run(0)
-    }
-
-    function run (i) {
-      // eslint-disable-next-line no-undef,consistent-return
-      fns[i](input, (err) => {
+    const run = i => {
+      fns[i](input, err => {
         // upon error, short-circuit
         if (err) return fn(err)
-        // eslint-disable-next-line no-undef
         if (!fns[i + 1]) return fn(null) // if no middleware left, summon callback
 
         // go on to next
         run(i + 1)
       })
     }
+    if (this.lifeCycleListeners[_signal]) {
+      fns = this.lifeCycleListeners[_signal].slice(0)
+      if (!fns.length) return fn(null)
+      run(0)
+    }
   }
 
-  applyLifeCycleListeners (_signal, data) {
+  applyLifeCycleListeners(_signal, data) {
     // function that runs after all middleware
-    function next (args) {
+    function next(args) {
       return args
     }
     this.useLifeCycleListeners(_signal, data, next)
@@ -166,13 +149,12 @@ class MewConnectCommon extends EventEmitter {
   /*
   * allows external function to listen for lifecycle events
   */
-  uiCommunicator (event, data) {
+  uiCommunicator(event, data) {
     console.log(event, data) // todo remove dev item
     this.emit(event, data)
-    // return data ? this.uiCommunicatorFunc(event, data) : this.uiCommunicatorFunc(event, null)
   }
-  // eslint-disable-next-line class-methods-use-this
-  isJSON (arg) {
+
+  isJSON(arg) {
     try {
       JSON.parse(arg)
       return true
@@ -182,4 +164,4 @@ class MewConnectCommon extends EventEmitter {
   }
 }
 
-module.exports = MewConnectCommon
+export default MewConnectCommon

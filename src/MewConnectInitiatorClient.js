@@ -1,5 +1,4 @@
-// require("babel-polyfill")
-const MewConnectInitiator = require('./MewConnectInitiator')
+import MewConnectInitiator from './MewConnectInitiator'
 
 class MewConnectInitiatorClient extends MewConnectInitiator {
   /**
@@ -7,7 +6,7 @@ class MewConnectInitiatorClient extends MewConnectInitiator {
    *  without needing to construct separate checking mechanisms
    *  and expose a factory method.
    */
-  constructor (uiCommunicatorFunc, loggingFunc, additionalLibs) {
+  constructor(uiCommunicatorFunc, loggingFunc, additionalLibs) {
     super(uiCommunicatorFunc, loggingFunc, additionalLibs)
     this.qrCodeString = null
     this.addressCallback = null
@@ -27,13 +26,12 @@ class MewConnectInitiatorClient extends MewConnectInitiator {
    * Factory Method that also attaches the created instance to
    * the creating static instance (I think...)
    */
-  static init (uiCommunicatorFunc, loggingFunc, additionalLibs) {
-    // if (typeof MewConnect !== 'undefined') {
-    //   // eslint-disable-next-line no-undef
-    //   this.instance = new MewConnect(uiCommunicatorFunc, loggingFunc, additionalLibs);
-    // } else {
-    // eslint-disable-next-line max-len
-    this.instance = new MewConnectInitiatorClient(uiCommunicatorFunc, loggingFunc, additionalLibs)
+  static init(uiCommunicatorFunc, loggingFunc, additionalLibs) {
+    this.instance = new MewConnectInitiatorClient(
+      uiCommunicatorFunc,
+      loggingFunc,
+      additionalLibs
+    )
     // }
     return this.instance
   }
@@ -41,22 +39,22 @@ class MewConnectInitiatorClient extends MewConnectInitiator {
   /**
    * @returns {MewConnect}
    */
-  static get () {
+  static get() {
     return this.instance
   }
 
-  isInternalMiddlewareActive () {
+  isInternalMiddlewareActive() {
     return this.internalMiddlewareActive
   }
 
-  isInternalLifeCycleActive () {
+  isInternalLifeCycleActive() {
     return this.internalLifeCycleActive
   }
 
   /**
    * set a function to handle receipt of the address from the mobile (receiver) peer
    */
-  setAddressCallback (func) {
+  setAddressCallback(func) {
     this.addressCallback = func
   }
 
@@ -65,56 +63,56 @@ class MewConnectInitiatorClient extends MewConnectInitiator {
    * set a function to handle
    */
   // TODO check if this is used or useful
-  setSignerCallback (func) {
+  setSignerCallback(func) {
     this.signerCallback = func
   }
 
   /**
    * set a function to handle receipt of a signed message
    */
-  setMessageSignerCallback (func) {
+  setMessageSignerCallback(func) {
     this.messageSignerCallback = func
   }
 
   /**
    * set a function to handle receipt of a signed transaction
    */
-  setTransactionSignerCallback (func) {
+  setTransactionSignerCallback(func) {
     this.transactionSignerCallback = func
   }
 
   /**
    * set a function to handle communicating lifeCycle events to the UI
    */
-  setCommunicationFunction (uiCommunicationFunc) {
+  setCommunicationFunction(uiCommunicationFunc) {
     this.uiCommunicatorFunc = uiCommunicationFunc
   }
 
   /**
    * set a function to handle receipt of the connection detail string (i.e. used to make QR Code)
    */
-  registerCodeDisplayCallback (func) {
+  registerCodeDisplayCallback(func) {
     this.registerLifeCycleListener('codeDisplay', func)
   }
 
   /**
    * set a function to handle communicating the establishment of the WebRTC session
    */
-  registerRtcConnectedCallback (func) {
+  registerRtcConnectedCallback(func) {
     this.registerLifeCycleListener('RtcConnectedEvent', func)
   }
 
   /**
    * set a function to handle communicating the WebRTC session closing
    */
-  registerRtcClosedCallback (func) {
+  registerRtcClosedCallback(func) {
     this.registerLifeCycleListener('RtcClosedEvent', func)
   }
 
   /**
    * set a function to handle communicating an error from the WebRTC session
    */
-  registerRtcErrorCallback (func) {
+  registerRtcErrorCallback(func) {
     this.registerLifeCycleListener('RtcErrorEvent', func)
   }
 
@@ -122,7 +120,7 @@ class MewConnectInitiatorClient extends MewConnectInitiator {
    * Call the defined lifeCycle handler functions if they exist, else proceed with
    * applying lifeCycle middleware until one handles the message type (purpose) or it is not handled
    */
-  configureInternalLifecycle () {
+  configureInternalLifecycle() {
     if (!this.internalLifeCycleActive) {
       this.internalLifeCycleActive = true
       this.use((data, next) => {
@@ -179,7 +177,7 @@ class MewConnectInitiatorClient extends MewConnectInitiator {
    * Call a defined message type handler function if it exist, else proceed with
    * applying message middleware until one handles the message type (purpose) or it is not handled
    */
-  configureInternalMiddleware () {
+  configureInternalMiddleware() {
     if (!this.internalMiddlewareActive) {
       this.internalMiddlewareActive = true
       this.use((data, next) => {
@@ -229,4 +227,4 @@ class MewConnectInitiatorClient extends MewConnectInitiator {
   }
 }
 
-module.exports = MewConnectInitiatorClient
+export default MewConnectInitiatorClient

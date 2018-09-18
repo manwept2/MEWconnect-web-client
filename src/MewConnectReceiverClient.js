@@ -1,5 +1,4 @@
-// require("babel-polyfill")
-const MewConnectReceiver = require('./MewConnectReceiver');
+import MewConnectReceiver from './MewConnectReceiver'
 
 class MewConnectReceiverClient extends MewConnectReceiver {
   /**
@@ -11,18 +10,18 @@ class MewConnectReceiverClient extends MewConnectReceiver {
    * @param additionalLibs
    */
   constructor(uiCommunicatorFunc, loggingFunc, additionalLibs) {
-    super(uiCommunicatorFunc, loggingFunc, additionalLibs);
-    this.qrCodeString = null;
-    this.addressCallback = null;
-    this.signerCallback = null;
-    this.messageSignerCallback = null;
-    this.transactionSignerCallback = null;
-    this.codeDisplayCallback = null;
-    this.rtcConnectedCallback = null;
-    this.rtcClosedCallback = null;
-    this.connected = false;
-    this.internalMiddlewareActive = false;
-    this.internalLifeCycleActive = false;
+    super(uiCommunicatorFunc, loggingFunc, additionalLibs)
+    this.qrCodeString = null
+    this.addressCallback = null
+    this.signerCallback = null
+    this.messageSignerCallback = null
+    this.transactionSignerCallback = null
+    this.codeDisplayCallback = null
+    this.rtcConnectedCallback = null
+    this.rtcClosedCallback = null
+    this.connected = false
+    this.internalMiddlewareActive = false
+    this.internalLifeCycleActive = false
   }
 
   /**
@@ -35,13 +34,21 @@ class MewConnectReceiverClient extends MewConnectReceiver {
   static init(uiCommunicatorFunc, loggingFunc, additionalLibs) {
     if (typeof MewConnect !== 'undefined') {
       // eslint-disable-next-line no-undef
-      this.instance = new MewConnect(uiCommunicatorFunc, loggingFunc, additionalLibs);
+      this.instance = new MewConnect(
+        uiCommunicatorFunc,
+        loggingFunc,
+        additionalLibs
+      )
     } else {
       // eslint-disable-next-line max-len
-      this.instance = new MewConnectReceiverClient(uiCommunicatorFunc, loggingFunc, additionalLibs);
+      this.instance = new MewConnectReceiverClient(
+        uiCommunicatorFunc,
+        loggingFunc,
+        additionalLibs
+      )
     }
     // this.instance = new MewConnect(uiCommunicatorFunc, loggingFunc, additionalLibs);
-    return this.instance;
+    return this.instance
   }
 
   /**
@@ -49,7 +56,7 @@ class MewConnectReceiverClient extends MewConnectReceiver {
    * @returns {MewConnect}
    */
   static get() {
-    return this.instance;
+    return this.instance
   }
 
   /**
@@ -57,7 +64,7 @@ class MewConnectReceiverClient extends MewConnectReceiver {
    * @returns {boolean}
    */
   isInternalMiddlewareActive() {
-    return this.internalMiddlewareActive;
+    return this.internalMiddlewareActive
   }
 
   /**
@@ -65,7 +72,7 @@ class MewConnectReceiverClient extends MewConnectReceiver {
    * @returns {boolean}
    */
   isInternalLifeCycleActive() {
-    return this.internalLifeCycleActive;
+    return this.internalLifeCycleActive
   }
 
   /**
@@ -73,7 +80,7 @@ class MewConnectReceiverClient extends MewConnectReceiver {
    * @param func
    */
   setAddressCallback(func) {
-    this.addressCallback = func;
+    this.addressCallback = func
   }
 
   /**
@@ -81,7 +88,7 @@ class MewConnectReceiverClient extends MewConnectReceiver {
    * @param func
    */
   setSignerCallback(func) {
-    this.signerCallback = func;
+    this.signerCallback = func
   }
 
   /**
@@ -89,7 +96,7 @@ class MewConnectReceiverClient extends MewConnectReceiver {
    * @param func
    */
   setMessageSignerCallback(func) {
-    this.messageSignerCallback = func;
+    this.messageSignerCallback = func
   }
 
   /**
@@ -97,7 +104,7 @@ class MewConnectReceiverClient extends MewConnectReceiver {
    * @param func
    */
   setTransactionSignerCallback(func) {
-    this.transactionSignerCallback = func;
+    this.transactionSignerCallback = func
   }
 
   /**
@@ -105,7 +112,7 @@ class MewConnectReceiverClient extends MewConnectReceiver {
    * @param uiCommunicationFunc
    */
   setCommunicationFunction(uiCommunicationFunc) {
-    this.uiCommunicatorFunc = uiCommunicationFunc;
+    this.uiCommunicatorFunc = uiCommunicationFunc
   }
 
   /**
@@ -113,7 +120,7 @@ class MewConnectReceiverClient extends MewConnectReceiver {
    * @param func
    */
   registerCodeDisplayCallback(func) {
-    this.registerLifeCycleListener('codeDisplay', func);
+    this.registerLifeCycleListener('codeDisplay', func)
   }
 
   /**
@@ -121,7 +128,7 @@ class MewConnectReceiverClient extends MewConnectReceiver {
    * @param func
    */
   registerRtcConnectedCallback(func) {
-    this.registerLifeCycleListener('RtcConnectedEvent', func);
+    this.registerLifeCycleListener('RtcConnectedEvent', func)
   }
 
   /**
@@ -129,7 +136,7 @@ class MewConnectReceiverClient extends MewConnectReceiver {
    * @param func
    */
   registerRtcClosedCallback(func) {
-    this.registerLifeCycleListener('RtcClosedEvent', func);
+    this.registerLifeCycleListener('RtcClosedEvent', func)
   }
 
   /**
@@ -137,47 +144,47 @@ class MewConnectReceiverClient extends MewConnectReceiver {
    */
   configureInternalLifecycle() {
     if (!this.internalLifeCycleActive) {
-      this.internalLifeCycleActive = true;
+      this.internalLifeCycleActive = true
       this.use((data, next) => {
         if (data) {
           if (data.type) {
             switch (data.type) {
               case 'codeDisplay':
                 if (!this.codeDisplayCallback) {
-                  next();
+                  next()
                 } else {
-                  this.codeDisplayCallback(data.data);
+                  this.codeDisplayCallback(data.data)
                 }
-                break;
+                break
               case 'RtcConnectedEvent':
-                this.connected = true;
+                this.connected = true
                 // if (this.instance) this.instance.connected = true;
                 if (!this.rtcConnectedCallback) {
-                  next();
+                  next()
                 } else {
-                  this.rtcConnectedCallback(data.data);
+                  this.rtcConnectedCallback(data.data)
                 }
-                break;
+                break
               // case "rtcDisconnect":
               // case "RtcDisconnectEvent":
               case 'RtcClosedEvent':
                 if (!this.rtcClosedCallback) {
-                  next();
+                  next()
                 } else {
-                  this.rtcClosedCallback(data.data);
+                  this.rtcClosedCallback(data.data)
                 }
-                break;
+                break
               default:
-                next();
-                break;
+                next()
+                break
             }
           } else {
-            next();
+            next()
           }
         } else {
-          next();
+          next()
         }
-      });
+      })
     }
   }
 
@@ -186,53 +193,52 @@ class MewConnectReceiverClient extends MewConnectReceiver {
    */
   configureInternalMiddleware() {
     if (!this.internalMiddlewareActive) {
-      this.internalMiddlewareActive = true;
+      this.internalMiddlewareActive = true
       this.use((data, next) => {
         if (data) {
           if (data.type) {
             switch (data.type) {
               case 'address':
                 if (!this.addressCallback) {
-                  next();
+                  next()
                 } else {
-                  this.addressCallback(data.data);
+                  this.addressCallback(data.data)
                 }
-                break;
+                break
               case 'sign':
                 if (!this.signerCallback) {
-                  next();
+                  next()
                 } else {
-                  this.signerCallback(data.data);
+                  this.signerCallback(data.data)
                 }
-                break;
+                break
               case 'signMessage':
                 if (!this.messageSignerCallback) {
-                  next();
+                  next()
                 } else {
-                  this.messageSignerCallback(data.data);
+                  this.messageSignerCallback(data.data)
                 }
-                break;
+                break
               case 'signTx':
                 if (!this.transactionSignerCallback) {
-                  next();
+                  next()
                 } else {
-                  this.transactionSignerCallback(data.data);
+                  this.transactionSignerCallback(data.data)
                 }
-                break;
+                break
               default:
-                next();
-                break;
+                next()
+                break
             }
           } else {
-            next();
+            next()
           }
         } else {
-          next();
+          next()
         }
-      });
+      })
     }
   }
 }
 
-
-module.exports = MewConnectReceiverClient;
+export default MewConnectReceiverClient
