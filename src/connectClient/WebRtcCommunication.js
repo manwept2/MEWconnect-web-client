@@ -1,3 +1,4 @@
+/*eslint-disable*/
 import createLogger from 'logging';
 import debugLogger from 'debug';
 
@@ -106,6 +107,8 @@ export default class WebRtcCommunication extends MewConnectCommon {
       } else if (this.enableTimer) {
         clearTimeout(this.turnTimer);
         this.turnTimer = setTimeout(() => {
+          debug("FALLBACK FALLBACK TIMER")
+          clearTimeout(this.turnTimer);
           this.willAttemptTurn();
         }, this.turnWaitTime);
       }
@@ -336,6 +339,7 @@ export default class WebRtcCommunication extends MewConnectCommon {
     debug(err.code);
     debug('error', err);
     if (!this.connected && !this.tryingTurn && !this.turnDisabled) {
+      debug("FALLBACK ON ERROR")
       this.useFallback();
     } else {
       if (!this.isAlive()) {

@@ -1,3 +1,4 @@
+/*eslint-disable*/
 import createLogger from 'logging';
 import debugLogger from 'debug';
 import { isBrowser } from 'browser-or-node';
