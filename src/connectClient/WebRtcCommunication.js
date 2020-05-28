@@ -1,4 +1,3 @@
-/*eslint-disable*/
 import createLogger from 'logging';
 import debugLogger from 'debug';
 
@@ -37,7 +36,7 @@ export default class WebRtcCommunication extends MewConnectCommon {
     this.versions = this.jsonDetails.versions;
     this.lifeCycle = this.jsonDetails.lifeCycle;
     this.iceStates = this.jsonDetails.iceConnectionState;
-this.fallbackCount = 0;
+    this.fallbackCount = 0;
     this.usingVersion = '';
     this.p = null;
     this.canSignal = false;
@@ -108,10 +107,10 @@ this.fallbackCount = 0;
       } else if (this.enableTimer) {
         clearTimeout(this.turnTimer);
         this.turnTimer = setTimeout(() => {
-          debug("FALLBACK TIMER")
+          debug('FALLBACK TIMER');
           // clearTimeout(this.turnTimer);
           this.fallbackCount++;
-          console.log(this.fallbackCount); // todo remove dev item
+          debug('fallback attempt count:', this.fallbackCount); // todo remove dev item
           this.willAttemptTurn();
         }, this.turnWaitTime);
       }
@@ -155,14 +154,17 @@ this.fallbackCount = 0;
     }
   }
 
-  receiveAnswer(plainTextOffer, peerID) {
+  receiveAnswer(plainTextOffer) {
     debug('receiveAnswer for version: ', this.usingVersion);
     this.fallbackTimer();
     if (this.tryingTurn && this.usingVersion === 'V1') {
       this.answersReceived.push(plainTextOffer);
       if (this.turnTimer === null) {
         const _self = this;
-        this.turnTimer = setTimeout(this.receiveTurnAnswer.bind(_self), this.turnResponseWaitTime);
+        this.turnTimer = setTimeout(
+          this.receiveTurnAnswer.bind(_self),
+          this.turnResponseWaitTime
+        );
       }
     } else if (this.tryingTurn && this.usingVersion === 'V2') {
       this.enableTimer = false;
@@ -342,7 +344,7 @@ this.fallbackCount = 0;
     debug(err.code);
     debug('error', err);
     if (!this.connected && !this.tryingTurn && !this.turnDisabled) {
-      debug("FALLBACK ON ERROR")
+      debug('FALLBACK ON ERROR');
       this.useFallback();
     } else {
       if (!this.isAlive()) {
@@ -368,7 +370,6 @@ this.fallbackCount = 0;
   disconnectRTCClosure() {
     return () => {
       debugStages('DISCONNECT RTC Closure');
-      console.log('disconnectRTCClosure'); // todo remove dev item
       this.connected = false;
       this.uiCommunicator(this.lifeCycle.RtcDisconnectEvent);
       this.rtcDestroy();
@@ -377,7 +378,6 @@ this.fallbackCount = 0;
   }
 
   disconnectRTC() {
-    console.log('disconnectRTCClosure'); // todo remove dev item
     debugStages('DISCONNECT RTC');
     this.connected = false;
     this.uiCommunicator(this.lifeCycle.RtcDisconnectEvent);
@@ -404,10 +404,10 @@ this.fallbackCount = 0;
   }
 
   rtcDestroy() {
-    console.log('rtcDestroy'); // todo remove dev item
+    debug('rtcDestroy'); // todo remove dev item
     if (this.isAlive()) {
       this.p.destroy();
-      console.log('DESTROYED'); // todo remove dev item
+      debug('DESTROYED'); // todo remove dev item
       this.connected = false;
       this.uiCommunicator(this.lifeCycle.RtcDestroyedEvent);
     } else if (!this.p.destroyed) {
